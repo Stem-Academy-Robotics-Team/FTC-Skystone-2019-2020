@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 
@@ -13,7 +14,7 @@ public class MecanumMovement extends LinearOpMode {
 
 
     //Elevator Declarations
-    private DcMotor elevatorMotor;
+    private DcMotorSimple elevatorMotor = null;
     private Servo ClawRightServo;
     private Servo ClawLeftServo;
 
@@ -51,10 +52,10 @@ public class MecanumMovement extends LinearOpMode {
 
     public void ElevatorInput(){
         if(gamepad1.left_trigger > 0.2){
-            elevatorMotor.setPower(-1);
+            elevatorMotor.setPower(-gamepad1.left_trigger);
         }
         if(gamepad1.right_trigger > 0.2){
-            elevatorMotor.setPower(1);
+            elevatorMotor.setPower(gamepad1.right_trigger);
         }
         if(gamepad1.right_trigger > 0.2 && gamepad1.left_trigger > 0.2){
             elevatorMotor.setPower(0);
@@ -75,13 +76,13 @@ public class MecanumMovement extends LinearOpMode {
         mforwardr = hardwareMap.dcMotor.get("mforwardright");
 
         //Elevator Assignment//
-        //elevatorMotor = hardwareMap.dcMotor.get("TODO");
+        elevatorMotor = hardwareMap.get(DcMotorSimple.class, "elevatorcontroller");
         //ClawRightServo = hardwareMap.servo.get("TODO");
         //ClawLeftServo = hardwareMap.servo.get("TODO");
 
         //Setup
-        mforwardl.setDirection(DcMotor.Direction.REVERSE);
-        mbackl.setDirection(DcMotor.Direction.REVERSE);
+        mforwardl.setDirection(DcMotor.Direction.REVERSE);//Reverse it I don't know how it works it just does
+
 
         waitForStart();
         if (opModeIsActive()) {
@@ -89,7 +90,7 @@ public class MecanumMovement extends LinearOpMode {
             while (opModeIsActive()) {
 
                 DriveShaftInput();
-
+                ElevatorInput();
                 telemetry.update();
             }
         }
