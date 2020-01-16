@@ -11,11 +11,11 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 
 public class MecanumMovement extends LinearOpMode {
+    //Variables
+    boolean ClawEngaged = false;
 
-    //Global Variables
-    final double minPosition = 0.0f;
-    final double maxPosition = 1.0f;
-    final double clawServoIncrement = 0.1f;
+    //Constants
+    final double ServoSpeed = 1.0d;
 
     //Elevator Declarations
     private DcMotorSimple elevatorMotor = null;
@@ -30,18 +30,21 @@ public class MecanumMovement extends LinearOpMode {
     private DcMotor mforwardr = null;
 
     public void ServoClawInput(){
-        if(gamepad1.left_bumper){
-            ClawRightServo.setPower(0.5d);
-            ClawLeftServo.setPower(-0.5d);
+
+        if(gamepad1.a){
+            ClawEngaged = !ClawEngaged;
+            sleep(500); //Avoid jittery button input
         }
-        if(gamepad1.right_bumper){
-            ClawRightServo.setPower(-0.5d);
-            ClawLeftServo.setPower(0.5d);
+
+        if(ClawEngaged){
+            ClawRightServo.setPower(-ServoSpeed);
+            ClawLeftServo.setPower(ServoSpeed);
         }
-        else{
-            ClawRightServo.setPower(-0.1d);
-            ClawLeftServo.setPower(0.1d);
+        if(!ClawEngaged){
+            ClawRightServo.setPower(0);
+            ClawLeftServo.setPower(0);
         }
+
     }
 
     public void DriveShaftInput(){
@@ -102,6 +105,8 @@ public class MecanumMovement extends LinearOpMode {
                 ElevatorInput();
                 ServoClawInput();
                 //Telemetry//
+                telemetry.addData("Claw Enabled?", ClawEngaged);
+                telemetry.addData("Elevator Speed:", elevatorMotor.getPower());
 
                 telemetry.update();
             }
