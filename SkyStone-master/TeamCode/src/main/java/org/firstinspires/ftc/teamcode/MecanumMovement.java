@@ -6,35 +6,41 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
+import com.qualcomm.robotcore.hardware.CRServo;
 @TeleOp
 
 
 public class MecanumMovement extends LinearOpMode {
 
+    //Global Variables
+    final double minPosition = 0.0f;
+    final double maxPosition = 1.0f;
+    final double clawServoIncrement = 0.1f;
 
     //Elevator Declarations
     private DcMotorSimple elevatorMotor = null;
-    private Servo ClawRightServo;
-    private Servo ClawLeftServo;
+    private CRServo ClawRightServo = null;
+    private CRServo ClawLeftServo = null;
 
-    //Drive Shaft Motor variable decleraitons
-    private DcMotor mbackl;
-    private DcMotor mbackr;
-    private DcMotor mforwardl;
-    private DcMotor mforwardr;
+
+    //Drive Shaft declarations
+    private DcMotor mbackl = null;
+    private DcMotor mbackr = null;
+    private DcMotor mforwardl = null;
+    private DcMotor mforwardr = null;
 
     public void ServoClawInput(){
         if(gamepad1.left_bumper){
-            //ClawRightServo.setPosition(TODO)
-            //ClawLeftServo.setPosition(TODO)
+            ClawRightServo.setPower(0.5d);
+            ClawLeftServo.setPower(-0.5d);
         }
         if(gamepad1.right_bumper){
-            //ClawRightServo.setPosition(TODO)
-            //ClawLeftServo.setPosition(TODO)
+            ClawRightServo.setPower(-0.5d);
+            ClawLeftServo.setPower(0.5d);
         }
         else{
-            //Do nothing: Leave in previous state
+            ClawRightServo.setPower(-0.1d);
+            ClawLeftServo.setPower(0.1d);
         }
     }
 
@@ -69,6 +75,8 @@ public class MecanumMovement extends LinearOpMode {
 
     public void runOpMode() {
 
+
+
         //Drive Shaft Motor Assignment//
         mbackl = hardwareMap.dcMotor.get("mbackleft");
         mbackr = hardwareMap.dcMotor.get("mbackright");
@@ -77,11 +85,12 @@ public class MecanumMovement extends LinearOpMode {
 
         //Elevator Assignment//
         elevatorMotor = hardwareMap.get(DcMotorSimple.class, "elevatorcontroller");
-        //ClawRightServo = hardwareMap.servo.get("TODO");
-        //ClawLeftServo = hardwareMap.servo.get("TODO");
+        ClawRightServo = hardwareMap.get(CRServo.class, "clawrightservo");
+        ClawLeftServo = hardwareMap.get(CRServo.class, "clawleftservo");
 
         //Setup
         mforwardl.setDirection(DcMotor.Direction.REVERSE);//Reverse it I don't know how it works it just does
+        mbackl.setDirection(DcMotor.Direction.REVERSE);
 
 
         waitForStart();
@@ -91,6 +100,9 @@ public class MecanumMovement extends LinearOpMode {
 
                 DriveShaftInput();
                 ElevatorInput();
+                ServoClawInput();
+                //Telemetry//
+
                 telemetry.update();
             }
         }
