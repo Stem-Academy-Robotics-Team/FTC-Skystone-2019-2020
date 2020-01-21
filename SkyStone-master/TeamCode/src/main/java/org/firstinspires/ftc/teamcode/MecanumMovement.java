@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.CRServo;
 @TeleOp
@@ -16,12 +14,12 @@ public class MecanumMovement extends LinearOpMode {
 
     //Constants
     final double ServoSpeed = 1.0d;
+    final long ButtonPause = 500; //Time in ms until button input is read again to avoid button jitter
 
     //Elevator Declarations
     private DcMotorSimple elevatorMotor = null;
     private CRServo ClawRightServo = null;
     private CRServo ClawLeftServo = null;
-
 
     //Drive Shaft declarations
     private DcMotor mbackl = null;
@@ -33,7 +31,7 @@ public class MecanumMovement extends LinearOpMode {
 
         if(gamepad1.a){
             ClawEngaged = !ClawEngaged;
-            sleep(500); //Avoid jittery button input
+            sleep(ButtonPause); //Avoid jittery button input
         }
 
         if(ClawEngaged){
@@ -74,12 +72,7 @@ public class MecanumMovement extends LinearOpMode {
         }
     }
 
-    @Override
-
-    public void runOpMode() {
-
-
-
+    public void Assignments(){
         //Drive Shaft Motor Assignment//
         mbackl = hardwareMap.dcMotor.get("mbackleft");
         mbackr = hardwareMap.dcMotor.get("mbackright");
@@ -90,6 +83,12 @@ public class MecanumMovement extends LinearOpMode {
         elevatorMotor = hardwareMap.get(DcMotorSimple.class, "elevatorcontroller");
         ClawRightServo = hardwareMap.get(CRServo.class, "clawrightservo");
         ClawLeftServo = hardwareMap.get(CRServo.class, "clawleftservo");
+    }
+    @Override
+
+    public void runOpMode() {
+
+        Assignments();
 
         //Setup
         mforwardl.setDirection(DcMotor.Direction.REVERSE);//Reverse it I don't know how it works it just does
@@ -104,6 +103,7 @@ public class MecanumMovement extends LinearOpMode {
                 DriveShaftInput();
                 ElevatorInput();
                 ServoClawInput();
+
                 //Telemetry//
                 telemetry.addData("Claw Enabled?", ClawEngaged);
                 telemetry.addData("Elevator Speed:", elevatorMotor.getPower());
